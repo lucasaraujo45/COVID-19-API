@@ -1,26 +1,63 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Axios from "axios";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends React.Component {
+
+  state = {
+    confirmed: 0,
+    recovered: 0,
+    deaths: 0,
+    countries: []
+  }
+
+  componentDidMount() {
+    this.getData();
+  }
+
+
+  async getData() {
+    const resApi = await Axios.get("https://covid19.mathdro.id/api")
+    const resCountries = await Axios.get("https://covid19.mathdro.id/api/countries")
+    const countries = Object.keys(resCountries.data.countries)
+    this.setState({
+      confirmed: resApi.data.confirmed.value,
+      recovered: resApi.data.recovered.value,
+      deaths: resApi.data.deaths.value,
+      countries
+
+    });
+  }
+
+  renderCountryOptions(){
+    return this.state.countries.map();
+  }
+
+  render() {
+    return (
+      <div className="container">
+        <h1>Corona update</h1>
+
+      <select>
+        {this.renderCountryOptions()}
+      </select>
+
+
+          <div class="flex">
+        <div className="box confirmed">
+            <h3>Confirmed cases</h3>
+            <h4>{this.state.confirmed}</h4>
+          </div>
+          <div className="box recovered">
+            <h3>Recovered cases</h3>
+            <h4>{this.state.recovered}</h4>
+          </div>
+          <div className="box deaths">
+            <h3>Deaths</h3>
+            <h4>{this.state.deaths}</h4>
+          </div>
+        </div>
+      </div>
+    )
+  }
 }
-
-export default App;
