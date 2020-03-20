@@ -3,6 +3,11 @@ import './App.css';
 import Axios from "axios";
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.getCountryData = this.getCountryData.bind(this);
+  }
 
   state = {
     confirmed: 0,
@@ -29,22 +34,45 @@ export default class App extends React.Component {
     });
   }
 
-  renderCountryOptions(){
-    return this.state.countries.map();
+  async getCountryData(e) {
+    try {
+      const res = await Axios.get(`https://covid19.mathdro.id/api/countries/${e.target.value}`);
+      this.setState({
+        confirmed: res.data.confirmed.value,
+        recovered: res.data.recovered.value,
+        deaths: res.data.deaths.value
+      });
+    }
+    catch (err) {
+      if(err.response.status === 404)
+      this.setState({
+        confirmed: "No Data Available",
+        recovered: "No Data Available",
+        deaths: "No Data Available"
+      });
+    }
   }
+
+  renderCountryOptions() {
+    return this.state.countries.map((country, i) => {
+      return <option key={i}>{country}</option>
+    });
+  }
+
+
 
   render() {
     return (
       <div className="container">
         <h1>Corona update</h1>
 
-      <select>
-        {this.renderCountryOptions()}
-      </select>
+        <select onChange={this.getCountryData}>
+          {this.renderCountryOptions()}
+        </select>
 
 
-          <div class="flex">
-        <div className="box confirmed">
+        <div class="flex">
+          <div className="box confirmed">
             <h3>Confirmed cases</h3>
             <h4>{this.state.confirmed}</h4>
           </div>
